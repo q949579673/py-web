@@ -27,14 +27,49 @@ def load_all_sheets_from_github():
 
 def main():
     st.set_page_config(layout="wide", page_title="煤炭质量分析")
-
+     
+    # 新增强制深色模式的meta标签
+    st.markdown("""
+        <meta name="color-scheme" content="only dark">
+        <meta name="theme-color" content="#2d2d2d">
+    """, unsafe_allow_html=True)
+    
     # 自定义深色主题样式
     st.markdown("""
     <style>
+        * 强制深色模式 */
         :root {
-            --sidebar-bg: #2d2d2d;
-            --text-color: white;
+            color-scheme: only dark !important;
+            --sidebar-bg: #1a1a1a;
+            --text-color: #e0e0e0;
             --primary-color: #00ff9d;
+        }
+        /* 覆盖系统主题适配 */
+        html, body, .stApp {
+            background-color: var(--sidebar-bg) !important;
+            color: var(--text-color) !important;
+        }
+
+        /* 强化侧边栏样式 */
+        [data-testid="stSidebar"] {
+            background: linear-gradient(
+                180deg,
+                var(--sidebar-bg),
+                #121212
+            ) !important;
+            border-right: 1px solid #404040 !important;
+        }
+
+        /* 深色模式下的输入控件 */
+        .stTextInput input, .stSelectbox select, .stTextArea textarea {
+            background: #333 !important;
+            border: 1px solid #555 !important;
+            color: white !important;
+        }
+
+        /* 适配表格样式 */
+        .stDataFrame {
+            background: #262626 !important;
         }
 
         body {
