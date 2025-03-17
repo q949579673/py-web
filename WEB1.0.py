@@ -29,35 +29,38 @@ def main():
     # 强制使用暗色主题并设置布局
     st.set_page_config(
         layout="wide",
-        theme="dark",
         page_title="煤炭质量分析"
     )
-
-    # 自定义主题颜色（可选）
+    # 统一主题配置
     st.theme_config(
+        theme="dark",
         background_color="#1e1e1e",
         text_color="white",
         primary_color="#00ff9d",
         secondary_color="#2d2d2d"
     )
 
-    # 延迟注入 CSS 确保 DOM 加载完成
+
+       # 延迟注入 CSS 确保 DOM 加载
     time.sleep(0.5)
     
     st.markdown("""
     <style>
-        /* 覆盖侧边栏容器 */
+        /* 覆盖侧边栏容器（根据实际结构调整）*/
         .stApp .sidebar-container .st-sidebar {
             background-color: #2d2d2d !important;
             color: white !important;
         }
 
-        /* 覆盖输入控件样式 */
-        input, select, textarea {
-            background: #333 !important;
+        /* 覆盖标题和控件样式 */
+        .stApp .sidebar-container .st-sidebar-header,
+        .stApp .sidebar-container input, 
+        .stApp .sidebar-container select, 
+        .stApp .sidebar-container button {
+            background: #2d2d2d !important;
             color: white !important;
-            border: 1px solid #444 !important;
             padding: 0.5rem;
+            border: 1px solid #444 !important;
         }
 
         /* 强制图表背景色 */
@@ -66,7 +69,7 @@ def main():
         }
     </style>
     """, unsafe_allow_html=True)
-
+    
     try:
         # 读取数据
         df = load_all_sheets_from_github()  # 替换为GitHub数据加载
