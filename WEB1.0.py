@@ -26,89 +26,83 @@ def load_all_sheets_from_github():
 
 
 def main():
+    st.set_page_config(layout="wide", page_title="煤炭质量分析")
+
+    # 自定义深色主题样式
     st.markdown("""
-<style>
-    /* 强制所有元素使用深色主题 */
-    body, .stApp, .stDataFrame, .stPlotlyChart {
-        color: white !important;
-        background-color: #2d2d2d !important;
-    }
+    <style>
+        :root {
+            --sidebar-bg: #2d2d2d;
+            --text-color: white;
+            --primary-color: #00ff9d;
+        }
 
-    /* 输入控件深度覆盖 */
-    .st-bw, .st-cm, .st-dh, .stSelectbox, .stTextInput {
-        background: #333 !important;
-        color: white !important;
-        border-color: #444 !important;
-    }
+        body {
+            background-color: var(--sidebar-bg);
+            color: var(--text-color);
+            font-family: Arial, sans-serif;
+        }
 
-    /* 表格单元格深度覆盖 */
-    .dataframe th, .dataframe td {
-        background-color: #333 !important;
-        color: white !important;
-        border-color: #444 !important;
-    }
+        .stApp {
+            background-color: var(--sidebar-bg);
+        }
 
-    /* 滑块控件样式 */
-    .stSlider .thumb {
-        background-color: #00ff9d !important;
-    }
-    .stSlider .track {
-        background-color: #444 !important;
-    }
+        /* 侧边栏样式 */
+        .sidebar-container .sidebar {
+            background-color: var(--sidebar-bg);
+            padding: 1rem;
+            border-right: 1px solid #404040;
+        }
 
-    /* 多选控件样式 */
-    .stMultiSelect [data-baseweb="tag"] {
-        background-color: #444 !important;
-        color: white !important;
-     /* 强制侧边栏容器 */
-    div[data-testid="stSidebar"] {
-        background: #2d2d2d !important;
-        border-right: 1px solid #444 !important;
-    }
+        /* 侧边栏标题样式 */
+        .sidebar .stSidebarHeader {
+            color: var(--text-color);
+            padding: 1rem;
+            border-bottom: 1px solid #404040;
+        }
 
-    /* 侧边栏标题强制深色 */
-    div[data-testid="stSidebar"] h1,
-    div[data-testid="stSidebar"] h2,
-    div[data-testid="stSidebar"] h3,
-    div[data-testid="stSidebar"] h4,
-    div[data-testid="stSidebar"] h5,
-    div[data-testid="stSidebar"] h6 {
-        color: white !important;
-    }
+        /* 输入控件样式 */
+        input, select, textarea {
+            background: #333;
+            color: white;
+            border: 1px solid #444;
+            padding: 0.5rem;
+        }
 
-    /* 侧边栏分隔线颜色 */
-    div[data-testid="stSidebar"] hr {
-        border-color: #555 !important;
-    }
+        /* 按钮样式 */
+        .stButton {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
 
-    /* 侧边栏菜单项 */
-    div[data-testid="stSidebar"] .st-c7 {
-        background-color: transparent !important;
-        color: white !important;
-    }
+        .stButton:hover {
+            background: #0056b3;
+        }
 
-    /* 侧边栏输入控件 */
-    div[data-testid="stSidebar"] .stTextInput input,
-    div[data-testid="stSidebar"] .stSelectbox select,
-    div[data-testid="stSidebar"] .stSlider div {
-        background: #333 !important;
-        color: white !important;
-        border-color: #444 !important;
-    }
+        /* 图表容器样式 */
+        .stPlotlyChart {
+            background: #333;
+            border: 1px solid #444;
+            padding: 1rem;
+        }
 
-    /* 侧边栏滚动条 */
-    div[data-testid="stSidebar"] ::-webkit-scrollbar {
-        width: 8px;
-    }
-    div[data-testid="stSidebar"] ::-webkit-scrollbar-track {
-        background: #2d2d2d;
-    }
-    div[data-testid="stSidebar"] ::-webkit-scrollbar-thumb {
-        background: #666;
-        border-radius: 4px;    
-    }
-</style>
-""", unsafe_allow_html=True)
+        /* 数据表格样式 */
+        .stDataFrame {
+            background: #333;
+            color: white;
+            border-collapse: collapse;
+        }
+
+        .stDataFrame td, .stDataFrame th {
+            border: 1px solid #444;
+            padding: 0.5rem;
+        }
+    </style>
+    """, unsafe_allow_html=True)
 
     try:
         # 读取数据
