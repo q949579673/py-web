@@ -43,6 +43,14 @@ def main():
             --text-color: #ffffff;  /* 改为纯白色 */
             --primary-color: #00ff9d;
         }
+        
+    /* 下拉框字体颜色修正 */
+    .stSelectbox select, 
+    .stSelectbox option,
+    .stSelectbox div[data-baseweb="select"] > div:first-child {
+        color: black !important;
+        background-color: white !important;
+    }
 
         /* 全局文字颜色 */
         body, .stApp, .stMarkdown, 
