@@ -1,7 +1,6 @@
 import pandas as pd
 import streamlit as st
 import plotly.express as px
-import time
 from itertools import chain
 
 
@@ -25,25 +24,86 @@ def load_all_sheets_from_github():
         st.stop()
 
 
+
 def main():
-    # 统一配置主题（兼容 Streamlit 1.0+）
-    st.config.update({
-        "page_title": "煤炭质量分析",
-        "layout": "wide",
-        "theme": "dark",
-        "bgcolor": "#1e1e1e",
-        "color": "white",
-    })
-    # 主题颜色通过 CSS 注入
+    st.set_page_config(layout="wide", page_title="煤炭质量分析")
+
+    # 自定义深色主题样式
     st.markdown("""
     <style>
         :root {
+            --sidebar-bg: #2d2d2d;
+            --text-color: white;
             --primary-color: #00ff9d;
-            --secondary-color: #2d2d2d;
+        }
+
+        body {
+            background-color: var(--sidebar-bg);
+            color: var(--text-color);
+            font-family: Arial, sans-serif;
+        }
+
+        .stApp {
+            background-color: var(--sidebar-bg);
+        }
+
+        /* 侧边栏样式 */
+        .sidebar-container .sidebar {
+            background-color: var(--sidebar-bg);
+            padding: 1rem;
+            border-right: 1px solid #404040;
+        }
+
+        /* 侧边栏标题样式 */
+        .sidebar .stSidebarHeader {
+            color: var(--text-color);
+            padding: 1rem;
+            border-bottom: 1px solid #404040;
+        }
+
+        /* 输入控件样式 */
+        input, select, textarea {
+            background: #333;
+            color: white;
+            border: 1px solid #444;
+            padding: 0.5rem;
+        }
+
+        /* 按钮样式 */
+        .stButton {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .stButton:hover {
+            background: #0056b3;
+        }
+
+        /* 图表容器样式 */
+        .stPlotlyChart {
+            background: #333;
+            border: 1px solid #444;
+            padding: 1rem;
+        }
+
+        /* 数据表格样式 */
+        .stDataFrame {
+            background: #333;
+            color: white;
+            border-collapse: collapse;
+        }
+
+        .stDataFrame td, .stDataFrame th {
+            border: 1px solid #444;
+            padding: 0.5rem;
         }
     </style>
     """, unsafe_allow_html=True)
-    
+
     try:
         # 读取数据
         df = load_all_sheets_from_github()  # 替换为GitHub数据加载
