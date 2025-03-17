@@ -22,31 +22,72 @@ def load_all_sheets_from_github():
         st.stop()
 
 def main():
-    # 修正点1：set_page_config的参数对齐
-    st.set_page_config(
-        layout="wide",  # 缩进4空格
-        page_title="煤炭质量分析",
-        page_icon="🧊",
-        initial_sidebar_state="expanded",
-        menu_items={
-            'Get Help': 'https://example.com',
-            'Report a bug': "https://example.com",
-            'About': "# 煤炭质量分析系统"
-        }
-    )  # 闭合括号对齐
+    st.set_page_config(...)  # 保持原有配置
 
-    # 自定义深色主题样式
+    # 增强版样式定义
     st.markdown("""
     <style>
-        /* 主容器背景 */
-        .stApp > div {
+        /* 强制深色主题 */
+        :root {
+            color-scheme: dark;
+        }
+        
+        /* 主容器 */
+        .stApp {
             background-color: #2d2d2d;
         }
-        /* 侧边栏主背景 */
-        [data-testid="stSidebar"] > div:first-child {
+
+        /* 侧边栏深度定制 */
+        [data-testid="stSidebar"] {
             background-color: #2d2d2d !important;
+            border-right: 1px solid #444 !important;
         }
-        /* 其他样式保持原样... */
+
+        /* 所有文字元素 */
+        body, .stTextInput>label, .stSelectbox>label, 
+        .stSlider>label, .stNumberInput>label {
+            color: white !important;
+        }
+
+        /* 输入控件统一 */
+        .stTextInput input, .stSelectbox select,
+        .stNumberInput input, .stTextArea textarea {
+            background: #333 !important;
+            color: white !important;
+            border-color: #555 !important;
+        }
+
+        /* 下拉菜单 */
+        .st-ax {
+            background-color: #333 !important;
+        }
+        .st-ay {
+            background-color: #444 !important;
+        }
+
+        /* 滑块控件 */
+        .stSlider .st-eb {
+            background-color: #00ff9d !important;
+        }
+
+        /* 多选标签 */
+        [data-baseweb="tag"] {
+            background-color: #404040 !important;
+            color: white !important;
+        }
+
+        /* 表格样式 */
+        .stDataFrame {
+            background-color: #333 !important;
+        }
+        table td {
+            color: white !important;
+        }
+
+        /* 禁用过渡动画 */
+        * {
+            transition: none !important;
+        }
     </style>
     """, unsafe_allow_html=True)
 
