@@ -185,19 +185,32 @@ def main():
             if idx >= 7:
                 break
             with next(cols):
+                # 创建图表（移除默认标题）
                 fig = px.line(
                     grouped,
                     x=x_col,
                     y=comp,
-                    title=f"{comp}趋势",
+                    title=None,  # 禁用自动标题
                     markers=True,
                     height=300,
                     template="plotly_dark",
                 )
+                
+                # 样式配置
                 line_color = '#00ff9d'
                 grid_color = 'rgba(200, 200, 200, 0.2)'
+                
+                # 统一布局设置
                 fig.update_layout(
-                    margin=dict(l=20, r=20, t=40, b=60),
+                    margin=dict(l=20, r=20, t=80, b=60),  # 增加顶部间距
+                    title={
+                        'text': f"{comp}趋势分析",          # 显示成分名称
+                        'y': 0.95,                        # 垂直位置（顶部5%位置）
+                        'x': 0.5,                         # 水平居中
+                        'xanchor': 'center',              # 水平锚点
+                        'yanchor': 'top',                 # 垂直锚点
+                        'font': dict(size=16)             # 标题字号
+                    },
                     xaxis=dict(
                         title=None,
                         tickformat=tickformat,
@@ -206,6 +219,7 @@ def main():
                         color='white'
                     ),
                     yaxis=dict(
+                        title=None,  # 移除纵轴标题
                         range=[grouped[comp].min() * 0.98, grouped[comp].max() * 1.02],
                         showgrid=True,
                         gridcolor=grid_color,
@@ -216,6 +230,8 @@ def main():
                     font=dict(color='white'),
                     hovermode="x unified"
                 )
+
+                # 线条样式
                 fig.update_traces(
                     line=dict(color=line_color, width=2),
                     marker=dict(color=line_color, size=8),
@@ -223,6 +239,7 @@ def main():
                         '<b>%{y:.2f}</b><br>%{x|%Y-%m}<extra></extra>'
                     )
                 )
+                
                 st.plotly_chart(fig, use_container_width=True)
 
     except Exception as e:
