@@ -60,6 +60,52 @@ def main():
     .stMultiSelect [data-baseweb="tag"] {
         background-color: #444 !important;
         color: white !important;
+     /* 强制侧边栏容器 */
+    div[data-testid="stSidebar"] {
+        background: #2d2d2d !important;
+        border-right: 1px solid #444 !important;
+    }
+
+    /* 侧边栏标题强制深色 */
+    div[data-testid="stSidebar"] h1,
+    div[data-testid="stSidebar"] h2,
+    div[data-testid="stSidebar"] h3,
+    div[data-testid="stSidebar"] h4,
+    div[data-testid="stSidebar"] h5,
+    div[data-testid="stSidebar"] h6 {
+        color: white !important;
+    }
+
+    /* 侧边栏分隔线颜色 */
+    div[data-testid="stSidebar"] hr {
+        border-color: #555 !important;
+    }
+
+    /* 侧边栏菜单项 */
+    div[data-testid="stSidebar"] .st-c7 {
+        background-color: transparent !important;
+        color: white !important;
+    }
+
+    /* 侧边栏输入控件 */
+    div[data-testid="stSidebar"] .stTextInput input,
+    div[data-testid="stSidebar"] .stSelectbox select,
+    div[data-testid="stSidebar"] .stSlider div {
+        background: #333 !important;
+        color: white !important;
+        border-color: #444 !important;
+    }
+
+    /* 侧边栏滚动条 */
+    div[data-testid="stSidebar"] ::-webkit-scrollbar {
+        width: 8px;
+    }
+    div[data-testid="stSidebar"] ::-webkit-scrollbar-track {
+        background: #2d2d2d;
+    }
+    div[data-testid="stSidebar"] ::-webkit-scrollbar-thumb {
+        background: #666;
+        border-radius: 4px;    
     }
 </style>
 """, unsafe_allow_html=True)
