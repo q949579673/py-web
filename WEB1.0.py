@@ -190,7 +190,7 @@ def main():
                     grouped,
                     x=x_col,
                     y=comp,
-                    title=None,  # 禁用自动标题
+                    title=None,
                     markers=True,
                     height=300,
                     template="plotly_dark",
@@ -202,28 +202,31 @@ def main():
                 
                 # 统一布局设置
                 fig.update_layout(
-                    margin=dict(l=20, r=20, t=80, b=60),  # 增加顶部间距
+                    margin=dict(l=20, r=20, t=80, b=60),
                     title={
-                        'text': f"{comp}趋势分析",          # 显示成分名称
-                        'y': 0.95,                        # 垂直位置（顶部5%位置）
-                        'x': 0.5,                         # 水平居中
-                        'xanchor': 'center',              # 水平锚点
-                        'yanchor': 'top',                 # 垂直锚点
-                        'font': dict(size=16)             # 标题字号
+                        'text': f"{comp}趋势分析",
+                        'y': 0.95,
+                        'x': 0.5,
+                        'xanchor': 'center',
+                        'yanchor': 'top',
+                        'font': {
+                            'size': 16,
+                            'color': 'white'  # 标题颜色与坐标轴一致
+                        }
                     },
                     xaxis=dict(
                         title=None,
                         tickformat=tickformat,
                         dtick=dtick,
                         showgrid=False,
-                        color='white'
+                        color='white'  # 坐标轴文字颜色
                     ),
                     yaxis=dict(
-                        title=None,  # 移除纵轴标题
+                        title=None,
                         range=[grouped[comp].min() * 0.98, grouped[comp].max() * 1.02],
                         showgrid=True,
                         gridcolor=grid_color,
-                        color='white'
+                        color='white'  # 坐标轴文字颜色
                     ),
                     plot_bgcolor='rgba(0, 0, 0, 0)',
                     paper_bgcolor='rgba(0, 0, 0, 0)',
