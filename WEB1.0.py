@@ -26,46 +26,30 @@ def load_all_sheets_from_github():
 
 
 def main():
-    # 统一使用 config.update() 配置主题（兼容所有版本）
-    st.config.update({
-        "page_title": "煤炭质量分析",
-        "layout": "wide",
-        "theme": "dark",
-        "bgcolor": "#1e1e1e",
-        "color": "white",
-        "primary_color": "#00ff9d",
-        "secondary_color": "#2d2d2d"
-    })
+# 更新后的配置（兼容 Streamlit 1.0+）
+st.config.update({
+    "page_title": "煤炭质量分析",
+    "layout": "wide",
+    "theme": "dark",
+    "bgcolor": "#1e1e1e",
+    "color": "white",
+})
 
-
-       # 延迟注入 CSS 确保 DOM 加载
-    time.sleep(0.5)
-    
-    st.markdown("""
-    <style>
-        /* 覆盖侧边栏容器（根据实际结构调整）*/
-        .stApp .sidebar-container .st-sidebar {
-            background-color: #2d2d2d !important;
-            color: white !important;
-        }
-
-        /* 覆盖标题和控件样式 */
-        .stApp .sidebar-container .st-sidebar-header,
-        .stApp .sidebar-container input, 
-        .stApp .sidebar-container select, 
-        .stApp .sidebar-container button {
-            background: #2d2d2d !important;
-            color: white !important;
-            padding: 0.5rem;
-            border: 1px solid #444 !important;
-        }
-
-        /* 强制图表背景色 */
-        .stPlotlyChart {
-            background-color: #333 !important;
-        }
-    </style>
-    """, unsafe_allow_html=True)
+# 主题颜色通过 CSS 注入
+st.markdown("""
+<style>
+:root {
+    --primary-color: #00ff9d;
+    --secondary-color: #2d2d2d;
+}
+.stApp .sidebar {
+    background-color: var(--secondary-color) !important;
+}
+.stButton {
+    background-color: var(--primary-color) !important;
+}
+</style>
+""", unsafe_allow_html=True)
     
     try:
         # 读取数据
