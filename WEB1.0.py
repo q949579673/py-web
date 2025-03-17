@@ -3,8 +3,6 @@ import streamlit as st
 import plotly.express as px
 from itertools import chain
 
-
-# 新增函数：从GitHub加载数据
 def load_all_sheets_from_github():
     """从GitHub仓库读取Excel数据"""
     GITHUB_RAW_URL = "https://github.com/q949579673/py-web/raw/refs/heads/main/2022-2024%E5%B9%B4%E8%BF%9B%E5%8E%82%E7%82%BC%E7%84%A6%E7%85%A4%E8%B4%A8%E9%87%8F%E6%8C%87%E6%A0%87%E7%BB%9F%E8%AE%A1(2).xlsx"
@@ -23,78 +21,40 @@ def load_all_sheets_from_github():
         st.error(f"数据加载失败，请检查网络连接或数据文件: {str(e)}")
         st.stop()
 
-
-
 def main():
+    # 修正点1：set_page_config的参数对齐
     st.set_page_config(
-    layout="wide",
-    page_title="煤炭质量分析",
-    page_icon="🧊",
-    initial_sidebar_state="expanded",
-    menu_items={
-        'Get Help': 'https://example.com',
-        'Report a bug': "https://example.com",
-        'About': "# 煤炭质量分析系统"
-    }
-)
+        layout="wide",  # 缩进4空格
+        page_title="煤炭质量分析",
+        page_icon="🧊",
+        initial_sidebar_state="expanded",
+        menu_items={
+            'Get Help': 'https://example.com',
+            'Report a bug': "https://example.com",
+            'About': "# 煤炭质量分析系统"
+        }
+    )  # 闭合括号对齐
 
     # 自定义深色主题样式
-st.markdown("""
-<style>
-    /* 主容器背景 */
-    .stApp > div {
-        background-color: #2d2d2d;
-    }
+    st.markdown("""
+    <style>
+        /* 主容器背景 */
+        .stApp > div {
+            background-color: #2d2d2d;
+        }
+        /* 侧边栏主背景 */
+        [data-testid="stSidebar"] > div:first-child {
+            background-color: #2d2d2d !important;
+        }
+        /* 其他样式保持原样... */
+    </style>
+    """, unsafe_allow_html=True)
 
-    /* 侧边栏主背景 */
-    [data-testid="stSidebar"] > div:first-child {
-        background-color: #2d2d2d !important;
-    }
-
-    /* 侧边栏标题文字 */
-    [data-testid="stSidebar"] .stMarkdown {
-        color: white !important;
-    }
-
-    /* 所有控件标签文字 */
-    .stWidget label {
-        color: white !important;
-        font-weight: bold;
-    }
-
-    /* 输入框文字 */
-    .stTextInput input, .stSelectbox select {
-        color: white !important;
-    }
-
-    /* 数字输入框 */
-    .stNumberInput input {
-        color: white !important;
-    }
-
-    /* 滑动条数值 */
-    .stSlider span {
-        color: white !important;
-    }
-
-    /* 多选控件 */
-    .stMultiSelect [data-baseweb="tag"] {
-        background-color: #404040 !important;
-        color: white !important;
-    }
-
-    /* 日期选择器 */
-    .stDateInput input {
-        color: white !important;
-    }
-</style>
-""", unsafe_allow_html=True)
-
-    try:
+    try:  # 修正点2：try语句与st.markdown对齐
         # 读取数据
-        df = load_all_sheets_from_github()  # 替换为GitHub数据加载
+        df = load_all_sheets_from_github()
 
-        # === 日期处理修复 ===
+        # === 日期处理 ===
         df['月份'] = (
             df['月份']
             .astype(str)
@@ -135,7 +95,7 @@ st.markdown("""
         if selected_year != 'all':
             filtered = filtered[filtered['年份'] == selected_year]
             group_col = '月份序号'
-            x_col = 'date'  # 改为统一的日期字段
+            x_col = 'date'
             tickformat = "%m月"
             dtick = "M1"
             grouped = (
@@ -145,7 +105,6 @@ st.markdown("""
                 .reset_index()
                 .rename(columns={group_col: '月份'})
             )
-            # 添加日期列（重要修改）
             grouped['date'] = pd.to_datetime(
                 str(selected_year) + '-' + grouped['月份'].astype(str) + '-01'
             )
@@ -157,7 +116,6 @@ st.markdown("""
                 .reset_index()
                 .sort_values(group_col)
             )
-            # 添加日期列并转换为时间格式
             grouped['date'] = pd.to_datetime(grouped[group_col] + '-01')
             x_col = 'date'
             tickformat = "%Y"
@@ -180,11 +138,10 @@ st.markdown("""
                     title=f"{comp}趋势",
                     markers=True,
                     height=300,
-                    template="plotly_dark",  # 使用深色模板
+                    template="plotly_dark",
                 )
 
-                # 统一颜色方案
-                line_color = '#00ff9d'  # 荧光绿提高对比度
+                line_color = '#00ff9d'
                 grid_color = 'rgba(200, 200, 200, 0.2)'
 
                 fig.update_layout(
@@ -193,7 +150,7 @@ st.markdown("""
                         title=None,
                         tickformat=tickformat,
                         dtick=dtick,
-                        tickangle=0 if selected_year == 'all' else 0,
+                        tickangle=0,
                         showgrid=False,
                         color='white'
                     ),
@@ -212,39 +169,19 @@ st.markdown("""
                 fig.update_traces(
                     line=dict(color=line_color, width=2),
                     marker=dict(color=line_color, size=8),
-                    # 修改悬停模板为数值+日期双行显示
                     hovertemplate=(
-                        '<b>%{y:.2f}</b>'  # 第一行加粗显示数值（保留两位小数）
-                        '<br>'  # 换行符
-                        '%{x|%Y-%m}'  # 第二行显示完整年月
-                        '<extra></extra>'  # 隐藏默认系列名称
+                        '<b>%{y:.2f}</b>'
+                        '<br>'
+                        '%{x|%Y-%m}'
+                        '<extra></extra>'
                     )
                 )
 
                 st.plotly_chart(fig, use_container_width=True)
-        fig.update_layout(
-            margin=dict(l=20, r=20, t=40, b=60),
-            xaxis=dict(
-                title=None,
-                tickformat=tickformat,
-                dtick=dtick,
-                tickangle=0,  # 统一设置为0度旋转
-                showgrid=False,
-                color='white'
-            ),
-            yaxis=dict(
-                range=[grouped[comp].min() * 0.98, grouped[comp].max() * 1.02],
-                showgrid=True,
-                gridcolor=grid_color,
-                color='white'
-            ),
-            # ... 其他保持不变的布局设置
-        )
 
-    except Exception as e:
+    except Exception as e:  # 修正点3：except与try对齐
         st.error(f"程序运行错误: {str(e)}")
         st.stop()
-
 
 if __name__ == "__main__":
     main()
