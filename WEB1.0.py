@@ -26,19 +26,16 @@ def load_all_sheets_from_github():
 
 
 def main():
-    # 强制使用暗色主题并设置布局
-    st.set_page_config(
-        layout="wide",
-        page_title="煤炭质量分析"
-    )
-    # 统一主题配置
-    st.theme_config(
-        theme="dark",
-        background_color="#1e1e1e",
-        text_color="white",
-        primary_color="#00ff9d",
-        secondary_color="#2d2d2d"
-    )
+    # 统一使用 config.update() 配置主题（兼容所有版本）
+    st.config.update({
+        "page_title": "煤炭质量分析",
+        "layout": "wide",
+        "theme": "dark",
+        "bgcolor": "#1e1e1e",
+        "color": "white",
+        "primary_color": "#00ff9d",
+        "secondary_color": "#2d2d2d"
+    })
 
 
        # 延迟注入 CSS 确保 DOM 加载
