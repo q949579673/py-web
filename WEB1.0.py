@@ -26,30 +26,23 @@ def load_all_sheets_from_github():
 
 
 def main():
-# 更新后的配置（兼容 Streamlit 1.0+）
-st.config.update({
-    "page_title": "煤炭质量分析",
-    "layout": "wide",
-    "theme": "dark",
-    "bgcolor": "#1e1e1e",
-    "color": "white",
-})
-
-# 主题颜色通过 CSS 注入
-st.markdown("""
-<style>
-:root {
-    --primary-color: #00ff9d;
-    --secondary-color: #2d2d2d;
-}
-.stApp .sidebar {
-    background-color: var(--secondary-color) !important;
-}
-.stButton {
-    background-color: var(--primary-color) !important;
-}
-</style>
-""", unsafe_allow_html=True)
+    # 统一配置主题（兼容 Streamlit 1.0+）
+    st.config.update({
+        "page_title": "煤炭质量分析",
+        "layout": "wide",
+        "theme": "dark",
+        "bgcolor": "#1e1e1e",
+        "color": "white",
+    })
+    # 主题颜色通过 CSS 注入
+    st.markdown("""
+    <style>
+        :root {
+            --primary-color: #00ff9d;
+            --secondary-color: #2d2d2d;
+        }
+    </style>
+    """, unsafe_allow_html=True)
     
     try:
         # 读取数据
