@@ -33,13 +33,6 @@ def main():
         page_title="煤炭质量分析"
     )
 
-    # 自定义主题颜色
-    st.theme_config(
-        background_color="#1e1e1e",
-        text_color="white",
-        primary_color="#00ff9d",
-        secondary_color="#2d2d2d"
-    )
 
     # 延迟注入 CSS 确保 DOM 加载完成
     time.sleep(0.5)
@@ -52,27 +45,12 @@ def main():
             color: white !important;
         }
 
-        /* 覆盖侧边栏标题 */
-        .stApp .sidebar-container .st-sidebar-header {
-            background-color: #2d2d2d !important;
-            padding: 1rem;
-        }
-
         /* 覆盖输入控件样式 */
         input, select, textarea {
             background: #333 !important;
             color: white !important;
             border: 1px solid #444 !important;
             padding: 0.5rem;
-        }
-
-        /* 覆盖按钮样式 */
-        .stButton {
-            background: #007bff !important;
-            color: white !important;
-            border: none !important;
-            padding: 0.5rem 1rem;
-            cursor: pointer;
         }
 
         /* 强制图表背景色 */
