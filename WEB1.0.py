@@ -3,6 +3,14 @@ import streamlit as st
 import plotly.express as px
 from itertools import chain
 
+# 新增全局颜色配置
+COLOR_CONFIG = {
+    "sidebar_bg": "#2d2d2d",
+    "text_color": "white",
+    "primary_color": "#00ff9d",
+    "grid_color": "rgba(200, 200, 200, 0.2)",
+    "hover_bg": "#333333"
+}
 
 # 新增函数：从GitHub加载数据
 def load_all_sheets_from_github():
@@ -23,90 +31,75 @@ def load_all_sheets_from_github():
         st.error(f"数据加载失败，请检查网络连接或数据文件: {str(e)}")
         st.stop()
 
-
-
 def main():
     st.set_page_config(layout="wide", page_title="煤炭质量分析")
 
-    # 自定义深色主题样式
-    st.markdown("""
+    # 动态生成CSS样式
+    st.markdown(f"""
     <style>
-        :root {
-            --sidebar-bg: #2d2d2d;
-            --text-color: white;
-            --primary-color: #00ff9d;
-        }
+        :root {{
+            --sidebar-bg: {COLOR_CONFIG['sidebar_bg']};
+            --text-color: {COLOR_CONFIG['text_color']};
+            --primary-color: {COLOR_CONFIG['primary_color']};
+            --grid-color: {COLOR_CONFIG['grid_color']};
+            --hover-bg: {COLOR_CONFIG['hover_bg']};
+        }}
 
-        body {
+        body {{
             background-color: var(--sidebar-bg);
             color: var(--text-color);
             font-family: Arial, sans-serif;
-        }
+        }}
 
-        .stApp {
+        .stApp {{
             background-color: var(--sidebar-bg);
-        }
+        }}
 
         /* 侧边栏样式 */
-        .sidebar-container .sidebar {
+        .sidebar-container .sidebar {{
             background-color: var(--sidebar-bg);
             padding: 1rem;
-            border-right: 1px solid #404040;
-        }
-
-        /* 侧边栏标题样式 */
-        .sidebar .stSidebarHeader {
-            color: var(--text-color);
-            padding: 1rem;
-            border-bottom: 1px solid #404040;
-        }
+            border-right: 1px solid var(--primary-color);
+        }}
 
         /* 输入控件样式 */
-        input, select, textarea {
-            background: #333;
-            color: white;
-            border: 1px solid #444;
+        input, select, textarea {{
+            background: var(--sidebar-bg);
+            color: var(--text-color);
+            border: 1px solid var(--primary-color);
             padding: 0.5rem;
-        }
+        }}
 
         /* 按钮样式 */
-        .stButton {
-            background: #007bff;
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
+        .stButton > button {{
+            background: var(--primary-color);
+            color: {COLOR_CONFIG['sidebar_bg']};
+            border: 1px solid var(--primary-color);
+            transition: all 0.3s;
+        }}
 
-        .stButton:hover {
-            background: #0056b3;
-        }
-
-        /* 图表容器样式 */
-        .stPlotlyChart {
-            background: #333;
-            border: 1px solid #444;
-            padding: 1rem;
-        }
+        .stButton > button:hover {{
+            filter: brightness(0.9);
+        }}
 
         /* 数据表格样式 */
-        .stDataFrame {
-            background: #333;
-            color: white;
-            border-collapse: collapse;
-        }
+        .stDataFrame {{
+            background: var(--sidebar-bg);
+            color: var(--text-color);
+            border: 1px solid var(--primary-color);
+        }}
 
-        .stDataFrame td, .stDataFrame th {
-            border: 1px solid #444;
-            padding: 0.5rem;
-        }
+        /* 悬停效果增强 */
+        .element-container:hover {{
+            background: var(--hover-bg);
+            transition: background 0.3s;
+        }}
     </style>
     """, unsafe_allow_html=True)
 
     try:
         # 读取数据
-        df = load_all_sheets_from_github()  # 替换为GitHub数据加载
+        df = load_all_sheets_from_github()
 
         # === 日期处理修复 ===
         df['月份'] = (
@@ -149,7 +142,7 @@ def main():
         if selected_year != 'all':
             filtered = filtered[filtered['年份'] == selected_year]
             group_col = '月份序号'
-            x_col = 'date'  # 改为统一的日期字段
+            x_col = 'date'
             tickformat = "%m月"
             dtick = "M1"
             grouped = (
@@ -159,7 +152,6 @@ def main():
                 .reset_index()
                 .rename(columns={group_col: '月份'})
             )
-            # 添加日期列（重要修改）
             grouped['date'] = pd.to_datetime(
                 str(selected_year) + '-' + grouped['月份'].astype(str) + '-01'
             )
@@ -171,13 +163,12 @@ def main():
                 .reset_index()
                 .sort_values(group_col)
             )
-            # 添加日期列并转换为时间格式
             grouped['date'] = pd.to_datetime(grouped[group_col] + '-01')
             x_col = 'date'
             tickformat = "%Y"
             dtick = "M12"
 
-        # === 可视化调整 ===
+        # === 可视化优化 ===
         st.title(f"{selected_item}质量趋势分析" + (f" - {selected_year}年" if selected_year != 'all' else ""))
 
         cols = chain(*[st.columns(2) for _ in range(4)])
@@ -194,71 +185,48 @@ def main():
                     title=f"{comp}趋势",
                     markers=True,
                     height=300,
-                    template="plotly_dark",  # 使用深色模板
                 )
 
-                # 统一颜色方案
-                line_color = '#00ff9d'  # 荧光绿提高对比度
-                grid_color = 'rgba(200, 200, 200, 0.2)'
-
+                # 使用统一颜色配置
                 fig.update_layout(
                     margin=dict(l=20, r=20, t=40, b=60),
                     xaxis=dict(
                         title=None,
                         tickformat=tickformat,
                         dtick=dtick,
-                        tickangle=0 if selected_year == 'all' else 0,
                         showgrid=False,
-                        color='white'
+                        color=COLOR_CONFIG['text_color'],
+                        linecolor=COLOR_CONFIG['primary_color']
                     ),
                     yaxis=dict(
                         range=[grouped[comp].min() * 0.98, grouped[comp].max() * 1.02],
                         showgrid=True,
-                        gridcolor=grid_color,
-                        color='white'
+                        gridcolor=COLOR_CONFIG['grid_color'],
+                        color=COLOR_CONFIG['text_color'],
+                        linecolor=COLOR_CONFIG['primary_color']
                     ),
-                    plot_bgcolor='rgba(0, 0, 0, 0)',
-                    paper_bgcolor='rgba(0, 0, 0, 0)',
-                    font=dict(color='white'),
+                    plot_bgcolor=COLOR_CONFIG['sidebar_bg'],
+                    paper_bgcolor=COLOR_CONFIG['sidebar_bg'],
+                    font=dict(color=COLOR_CONFIG['text_color']),
                     hovermode="x unified"
                 )
 
                 fig.update_traces(
-                    line=dict(color=line_color, width=2),
-                    marker=dict(color=line_color, size=8),
-                    # 修改悬停模板为数值+日期双行显示
+                    line=dict(color=COLOR_CONFIG['primary_color'], width=2),
+                    marker=dict(color=COLOR_CONFIG['primary_color'], size=8),
                     hovertemplate=(
-                        '<b>%{y:.2f}</b>'  # 第一行加粗显示数值（保留两位小数）
-                        '<br>'  # 换行符
-                        '%{x|%Y-%m}'  # 第二行显示完整年月
-                        '<extra></extra>'  # 隐藏默认系列名称
+                        '<b>%{y:.2f}</b>'
+                        '<br>'
+                        '%{x|%Y-%m}'
+                        '<extra></extra>'
                     )
                 )
 
                 st.plotly_chart(fig, use_container_width=True)
-        fig.update_layout(
-            margin=dict(l=20, r=20, t=40, b=60),
-            xaxis=dict(
-                title=None,
-                tickformat=tickformat,
-                dtick=dtick,
-                tickangle=0,  # 统一设置为0度旋转
-                showgrid=False,
-                color='white'
-            ),
-            yaxis=dict(
-                range=[grouped[comp].min() * 0.98, grouped[comp].max() * 1.02],
-                showgrid=True,
-                gridcolor=grid_color,
-                color='white'
-            ),
-            # ... 其他保持不变的布局设置
-        )
 
     except Exception as e:
         st.error(f"程序运行错误: {str(e)}")
         st.stop()
-
 
 if __name__ == "__main__":
     main()
