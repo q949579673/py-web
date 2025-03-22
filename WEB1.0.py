@@ -295,6 +295,7 @@ def main():
                         xaxis=dict(
                             tickformat="%m/%d",  # 显示月/日格式
                             tickvals=grouped['date'],  # 显示所有日期刻度
+                            dtick=dtick,
                             tickangle=45 if len(grouped) > 10 else 0  # 数据点多时倾斜显示
                         )
                     )
@@ -368,7 +369,7 @@ def main():
                         tickangle=0,  # 统一设置为0度旋转
                         showgrid=False,
                         color='white',
-                        tickangle=45 if len(grouped) > 10 else 0
+                        
                         
                     ),
                     yaxis=dict(
