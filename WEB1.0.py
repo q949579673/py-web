@@ -21,8 +21,8 @@ def load_all_sheets_from_github():
             df = df[mask]
             dfs.append(df)
         return pd.concat(dfs, ignore_index=True)
-    
-    
+
+
     except Exception as e:  # ✅ 添加异常处理
         st.error(f"数据加载失败: {str(e)}")
         return pd.DataFrame()  # 返回空DataFrame保持程序运行
@@ -144,7 +144,7 @@ def main():
         df['年份'] = df['月份'].dt.year
         df['月份序号'] = df['月份'].dt.month
         df['年月'] = df['月份'].dt.strftime('%Y-%m')
-       
+
         # 过滤无效日期
         df = df.dropna(subset=['原始日期', '月份']).copy()
 
@@ -157,7 +157,7 @@ def main():
             unique_items,
             help="支持输入文字快速筛选"
         )
-       
+
         year_options = sorted(df['年份'].unique())
         year_options.insert(0, 'all')
         selected_year = st.sidebar.selectbox(
@@ -166,9 +166,9 @@ def main():
             format_func=lambda x: '检索ITEM所有日期数据' if x == 'all' else x,
             index=0
         )
-        
+
         # 新增日期范围选择器（放在ITEM类型选择之后）
-        use_custom_dates = st.sidebar.checkbox("📅 按日期自定义查询", help="启用后将忽略上方的分析范围选择") 
+        use_custom_dates = st.sidebar.checkbox("📅 按日期自定义查询", help="启用后将忽略上方的分析范围选择")
         # 获取数据集中的日期范围
         min_date = df['原始日期'].min().to_pydatetime()
         max_date = df['原始日期'].max().to_pydatetime()
@@ -184,17 +184,9 @@ def main():
                 max_value=max_date,
                 format="YYYY/MM/DD"  # 添加中文格式显示
             )
-            # 新增折线图切换选项
-            use_line_chart = st.sidebar.checkbox(
-                "📈 切换折线图模式",
-                help="启用后将用折线图连接数据点"
-            )
         else:
             selected_dates = (min_date, max_date)  # 默认使用全部日期范围
-            use_line_chart = False
 
-        
-       
         # === 数据过滤和聚合 ===
         filtered = df[df.iloc[:, 4] == selected_item]
         # 动态日期列选择
@@ -207,7 +199,7 @@ def main():
             filtered = filtered[
                 (filtered['原始日期'] >= start_date) &
                 (filtered['原始日期'] <= end_date)
-            ]
+                ]
             # 添加日期格式化列
             filtered['格式化日期'] = filtered['原始日期'].dt.strftime('%Y-%m-%d')
         else:
@@ -250,24 +242,19 @@ def main():
             # 直接使用原始数据，不进行聚合
             grouped = filtered.copy()
             grouped['date'] = grouped[date_col]
-             # 新增：传递格式化日期列
-            grouped['格式化日期'] = filtered['格式化日期'] 
-            # ✅ 确保列名一致（改用英文列名）
-            grouped['formatted_date'] = filtered['原始日期'].dt.strftime('%Y-%m-%d')  # 新增
 
-    
             # 时间轴配置（根据实际日期范围动态调整）
             date_diff = (end_date - start_date).days
-            if date_diff <= 7:    # 周粒度
+            if date_diff <= 7:  # 周粒度
                 tickformat = "%m-%d"
                 dtick = "D1"
             elif date_diff <= 31:  # 月粒度
                 tickformat = "%m-%d"
                 dtick = "D3"
-            else:                  # 年粒度
+            else:  # 年粒度
                 tickformat = "%Y-%m"
                 dtick = "M1"
-    
+
             x_col = 'date'  # 统一使用实际日期字段
 
         # === 可视化调整 ===
@@ -295,16 +282,15 @@ def main():
                             comp: ':.2f'  # 保留两位小数
                         }
                     )
-                    #优化时间轴显示
+                    # 优化时间轴显示
                     fig.update_layout(
                         xaxis=dict(
                             tickformat="%m/%d",  # 显示月/日格式
                             tickvals=grouped['date'],  # 显示所有日期刻度
-                            dtick=dtick,
                             tickangle=45 if len(grouped) > 10 else 0  # 数据点多时倾斜显示
                         )
                     )
-                
+
                 else:  # 原聚合模式
                     fig = px.line(
                         grouped,
@@ -316,40 +302,6 @@ def main():
                         template="plotly_dark",
                     )
 
-                # 根据切换状态选择图表类型
-                if use_line_chart:
-                    fig = px.line(
-                        grouped,
-                        x=x_col,
-                        y=comp,
-                        title=None,
-                        height=300,
-                        template="plotly_dark",
-                        markers=True,  # 保留数据点标记
-                        line_shape='linear',  # 线性连接
-                        color_discrete_sequence=['#00ff9d'],
-                        hover_data={
-                            '格式化日期': True,
-                            comp: ':.2f'
-                        }
-                    )
-                else:
-                    fig = px.scatter(
-                        grouped,
-                        x=x_col,
-                        y=comp,
-                        title=None,
-                        height=300,
-                        template="plotly_dark",
-                        opacity=0.7,
-                        color_discrete_sequence=['#00ff9d'],
-                        hover_data={
-                            '格式化日期': True,
-                            comp: ':.2f'
-                        }
-                    )
-                
-
                 # 统一颜色方案
                 line_color = '#00ff9d'  # 荧光绿提高对比度
                 grid_color = 'rgba(200, 200, 200, 0.2)'
@@ -358,8 +310,8 @@ def main():
                     margin=dict(l=20, r=20, t=80, b=60),
                     title={
                         'text': comp,  # 成分名称
-                        'y': 0.95,     # 纵向位置（0-1区间）
-                        'x': 0.5,      # 横向居中
+                        'y': 0.95,  # 纵向位置（0-1区间）
+                        'x': 0.5,  # 横向居中
                         'xanchor': 'center',
                         'yanchor': 'top',
                         'font': {
@@ -373,9 +325,7 @@ def main():
                         dtick=dtick,
                         tickangle=0,  # 统一设置为0度旋转
                         showgrid=False,
-                        color='white',
-                        
-                        
+                        color='white'
                     ),
                     yaxis=dict(
                         title=None,
@@ -403,7 +353,7 @@ def main():
                 )
 
                 st.plotly_chart(fig, use_container_width=True)
-       
+
 
     except Exception as e:
         st.error(f"程序运行错误: {str(e)}")
