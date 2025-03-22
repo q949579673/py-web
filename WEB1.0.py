@@ -184,14 +184,13 @@ def main():
                 max_value=max_date,
                 format="YYYY/MM/DD"  # 添加中文格式显示
             )
-        else:
-            selected_dates = (min_date, max_date)  # 默认使用全部日期范围
             # 新增折线图切换选项
             use_line_chart = st.sidebar.checkbox(
                 "📈 切换折线图模式",
                 help="启用后将用折线图连接数据点"
             )
         else:
+            selected_dates = (min_date, max_date)  # 默认使用全部日期范围
             use_line_chart = False
 
         
