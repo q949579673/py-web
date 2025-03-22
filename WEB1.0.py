@@ -121,8 +121,15 @@ def main():
     try:
         # 数据加载和处理
         df = load_all_sheets_from_github()
+        # 处理B列原始日期（精确到日）
+        df['原始日期'] = (
+            df.iloc[:, 1].astype(str)  # 假设B列是第2列
+            .str.replace(r'[^0-9]', '', regex=True)  # 去除非数字字符
+            .str[:8]  # 取前8位数字
+            .pipe(lambda s: pd.to_datetime(s, format='%Y%m%d', errors='coerce'))
+        )
 
-        # === 日期处理修复 ===
+        # 处理C列月份
         df['月份'] = (
             df['月份']
             .astype(str)
@@ -137,6 +144,9 @@ def main():
         df['年份'] = df['月份'].dt.year
         df['月份序号'] = df['月份'].dt.month
         df['年月'] = df['月份'].dt.strftime('%Y-%m')
+       
+        # 过滤无效日期
+        df = df.dropna(subset=['原始日期', '月份']).copy()
 
         # === 侧边栏控件 ===
         st.sidebar.header("分析条件设置")
@@ -147,7 +157,7 @@ def main():
             unique_items,
             help="支持输入文字快速筛选"
         )
-
+       
         year_options = sorted(df['年份'].unique())
         year_options.insert(0, 'all')
         selected_year = st.sidebar.selectbox(
@@ -156,40 +166,96 @@ def main():
             format_func=lambda x: '检索ITEM所有日期数据' if x == 'all' else x,
             index=0
         )
-
-        # === 数据过滤和聚合 ===
-        filtered = df[df.iloc[:, 4] == selected_item]
-
-        if selected_year != 'all':
-            filtered = filtered[filtered['年份'] == selected_year]
-            group_col = '月份序号'
-            x_col = 'date'  # 改为统一的日期字段
-            tickformat = "%m月"
-            dtick = "M1"
-            grouped = (
-                filtered.groupby(group_col)
-                .agg({col: 'mean' for col in df.columns[5:12]})
-                .reindex(range(1, 13))
-                .reset_index()
-                .rename(columns={group_col: '月份'})
-            )
-            # 添加日期列（重要修改）
-            grouped['date'] = pd.to_datetime(
-                str(selected_year) + '-' + grouped['月份'].astype(str) + '-01'
+        
+        # 新增日期范围选择器（放在ITEM类型选择之后）
+        use_custom_dates = st.sidebar.checkbox("📅 按日期自定义查询", help="启用后将忽略上方的分析范围选择") 
+        # 获取数据集中的日期范围
+        min_date = df['原始日期'].min().to_pydatetime()
+        max_date = df['原始日期'].max().to_pydatetime()
+        # 设置默认日期范围（最近7天）
+        default_end = max_date
+        default_start = max_date - pd.DateOffset(days=6)
+        # 日期选择器（仅在勾选时显示）
+        if use_custom_dates:
+            selected_dates = st.sidebar.date_input(
+                "选择查询日期范围",
+                value=(default_start, default_end),
+                min_value=min_date,
+                max_value=max_date
+                format="YYYY/MM/DD"  # 添加中文格式显示
             )
         else:
-            group_col = '年月'
-            grouped = (
-                filtered.groupby(group_col)
-                .agg({col: 'mean' for col in df.columns[5:12]})
-                .reset_index()
-                .sort_values(group_col)
-            )
-            # 添加日期列并转换为时间格式
-            grouped['date'] = pd.to_datetime(grouped[group_col] + '-01')
-            x_col = 'date'
-            tickformat = "%Y"
-            dtick = "M12"
+            selected_dates = (min_date, max_date)  # 默认使用全部日期范围
+       
+        # === 数据过滤和聚合 ===
+        filtered = df[df.iloc[:, 4] == selected_item]
+        # 动态日期列选择
+        date_col = '原始日期' if use_custom_dates else '月份'
+        # 增强日期范围过滤
+        if use_custom_dates:
+            # 使用B列原始日期过滤
+            start_date = pd.to_datetime(selected_dates[0]).floor('D')
+            end_date = pd.to_datetime(selected_dates[1]).ceil('D')
+            filtered = filtered[
+                (filtered['原始日期'] >= start_date) &
+                (filtered['原始日期'] <= end_date)
+            ]
+            # 添加日期格式化列
+            filtered['格式化日期'] = filtered['原始日期'].dt.strftime('%Y-%m-%d')
+        else:
+            # 使用C列月份过滤
+            if selected_year != 'all':
+                filtered = filtered[filtered['年份'] == selected_year]
+
+        if not use_custom_dates:  # 原逻辑（聚合模式）
+            if selected_year != 'all':
+                filtered = filtered[filtered['年份'] == selected_year]
+                group_col = '月份序号'
+                x_col = 'date'  # 改为统一的日期字段
+                tickformat = "%m月"
+                dtick = "M1"
+                grouped = (
+                    filtered.groupby(group_col)
+                    .agg({col: 'mean' for col in df.columns[5:12]})
+                    .reindex(range(1, 13))
+                    .reset_index()
+                    .rename(columns={group_col: '月份'})
+                )
+                # 添加日期列（重要修改）
+                grouped['date'] = pd.to_datetime(
+                    str(selected_year) + '-' + grouped['月份'].astype(str) + '-01'
+                )
+            else:
+                group_col = '年月'
+                grouped = (
+                    filtered.groupby(group_col)
+                    .agg({col: 'mean' for col in df.columns[5:12]})
+                    .reset_index()
+                    .sort_values(group_col)
+                )
+                # 添加日期列并转换为时间格式
+                grouped['date'] = pd.to_datetime(grouped[group_col] + '-01')
+                x_col = 'date'
+                tickformat = "%Y"
+                dtick = "M12"
+        else:  # 新增自定义日期模式（原始数据模式）
+            # 直接使用原始数据，不进行聚合
+            grouped = filtered.copy()
+            grouped['date'] = grouped[date_col]
+    
+            # 时间轴配置（根据实际日期范围动态调整）
+            date_diff = (end_date - start_date).days
+            if date_diff <= 7:    # 周粒度
+                tickformat = "%m-%d"
+                dtick = "D1"
+            elif date_diff <= 31:  # 月粒度
+                tickformat = "%m-%d"
+                dtick = "D3"
+            else:                  # 年粒度
+                tickformat = "%Y-%m"
+                dtick = "M1"
+    
+            x_col = 'date'  # 统一使用实际日期字段
 
         # === 可视化调整 ===
         st.title(f"{selected_item}质量趋势分析" + (f" - {selected_year}年" if selected_year != 'all' else ""))
@@ -201,15 +267,40 @@ def main():
                 break
 
             with next(cols):
-                fig = px.line(
-                    grouped,
-                    x=x_col,
-                    y=comp,
-                    title=None,
-                    markers=True,
-                    height=300,
-                    template="plotly_dark",  # 使用深色模板
-                )
+                if use_custom_dates:  # 自定义日期模式使用原始数据点
+                    fig = px.scatter(  # 改用散点图显示每个数据点
+                        grouped,
+                        x=x_col,
+                        y=comp,
+                        title=None,
+                        height=300,
+                        template="plotly_dark",
+                        opacity=0.7,
+                        color_discrete_sequence=['#00ff9d']，
+                        hover_data={
+                            '格式化日期': True,  # 显示格式化日期
+                            comp: ':.2f'  # 保留两位小数
+                        }
+                    )
+                    #优化时间轴显示
+                    fig.update_layout(
+                        xaxis=dict(
+                            tickformat="%m/%d",  # 显示月/日格式
+                            tickvals=grouped['date'],  # 显示所有日期刻度
+                            tickangle=45 if len(grouped) > 10 else 0  # 数据点多时倾斜显示
+                        )
+                    )
+                
+                else:  # 原聚合模式
+                    fig = px.line(
+                        grouped,
+                        x=x_col,
+                        y=comp,
+                        title=None,
+                        markers=True,
+                        height=300,
+                        template="plotly_dark",
+                    )
 
                 # 统一颜色方案
                 line_color = '#00ff9d'  # 荧光绿提高对比度
