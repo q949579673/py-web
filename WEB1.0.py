@@ -186,6 +186,15 @@ def main():
             )
         else:
             selected_dates = (min_date, max_date)  # 默认使用全部日期范围
+            # 新增折线图切换选项
+            use_line_chart = st.sidebar.checkbox(
+                "📈 切换折线图模式",
+                help="启用后将用折线图连接数据点"
+            )
+        else:
+            use_line_chart = False
+
+        
        
         # === 数据过滤和聚合 ===
         filtered = df[df.iloc[:, 4] == selected_item]
@@ -302,6 +311,40 @@ def main():
                         template="plotly_dark",
                     )
 
+                # 根据切换状态选择图表类型
+                if use_line_chart:
+                    fig = px.line(
+                        grouped,
+                        x=x_col,
+                        y=comp,
+                        title=None,
+                        height=300,
+                        template="plotly_dark",
+                        markers=True,  # 保留数据点标记
+                        line_shape='linear',  # 线性连接
+                        color_discrete_sequence=['#00ff9d'],
+                        hover_data={
+                            '格式化日期': True,
+                            comp: ':.2f'
+                        }
+                    )
+                else:
+                    fig = px.scatter(
+                        grouped,
+                        x=x_col,
+                        y=comp,
+                        title=None,
+                        height=300,
+                        template="plotly_dark",
+                        opacity=0.7,
+                        color_discrete_sequence=['#00ff9d'],
+                        hover_data={
+                            '格式化日期': True,
+                            comp: ':.2f'
+                        }
+                    )
+                
+
                 # 统一颜色方案
                 line_color = '#00ff9d'  # 荧光绿提高对比度
                 grid_color = 'rgba(200, 200, 200, 0.2)'
@@ -325,7 +368,9 @@ def main():
                         dtick=dtick,
                         tickangle=0,  # 统一设置为0度旋转
                         showgrid=False,
-                        color='white'
+                        color='white',
+                        tickangle=45 if len(grouped) > 10 else 0
+                        
                     ),
                     yaxis=dict(
                         title=None,
