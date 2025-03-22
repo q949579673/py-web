@@ -181,7 +181,7 @@ def main():
                 "选择查询日期范围",
                 value=(default_start, default_end),
                 min_value=min_date,
-                max_value=max_date
+                max_value=max_date,
                 format="YYYY/MM/DD"  # 添加中文格式显示
             )
         else:
@@ -276,7 +276,7 @@ def main():
                         height=300,
                         template="plotly_dark",
                         opacity=0.7,
-                        color_discrete_sequence=['#00ff9d']，
+                        color_discrete_sequence=['#00ff9d'],
                         hover_data={
                             '格式化日期': True,  # 显示格式化日期
                             comp: ':.2f'  # 保留两位小数
@@ -323,6 +323,7 @@ def main():
                         title=None,
                         tickformat=tickformat,
                         dtick=dtick,
+                        tickangle=0,  # 统一设置为0度旋转
                         showgrid=False,
                         color='white'
                     ),
@@ -352,24 +353,7 @@ def main():
                 )
 
                 st.plotly_chart(fig, use_container_width=True)
-        fig.update_layout(
-            margin=dict(l=20, r=20, t=40, b=60),
-            xaxis=dict(
-                title=None,
-                tickformat=tickformat,
-                dtick=dtick,
-                tickangle=0,  # 统一设置为0度旋转
-                showgrid=False,
-                color='white'
-            ),
-            yaxis=dict(
-                range=[grouped[comp].min() * 0.98, grouped[comp].max() * 1.02],
-                showgrid=True,
-                gridcolor=grid_color,
-                color='white'
-            ),
-            # ... 其他保持不变的布局设置
-        )
+       
 
     except Exception as e:
         st.error(f"程序运行错误: {str(e)}")
