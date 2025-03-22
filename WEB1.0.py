@@ -30,7 +30,11 @@ def load_all_sheets_from_github():
 
 def main():
     st.set_page_config(layout="wide", page_title="煤炭质量分析")
-
+        # 强制深色模式设置
+    st.markdown("""
+        <meta name="color-scheme" content="only dark">
+        <meta name="theme-color" content="#2d2d2d">
+    """, unsafe_allow_html=True)
     # 自定义深色主题样式
     st.markdown("""
     <style>
