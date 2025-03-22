@@ -252,6 +252,8 @@ def main():
             grouped['date'] = grouped[date_col]
              # 新增：传递格式化日期列
             grouped['格式化日期'] = filtered['格式化日期'] 
+            # ✅ 确保列名一致（改用英文列名）
+            grouped['formatted_date'] = filtered['原始日期'].dt.strftime('%Y-%m-%d')  # 新增
 
     
             # 时间轴配置（根据实际日期范围动态调整）
