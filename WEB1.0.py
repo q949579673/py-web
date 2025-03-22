@@ -13,8 +13,8 @@ def load_all_sheets_from_github():
         for sheet in sheet_names:
             df = pd.read_excel(xls, sheet_name=sheet)
             mask = (
-                df.iloc[:, 4].str.contains('煤', na=False, regex=True)  # 按实际关键词修改
-                & ~df.iloc[:, 4].str.startswith('日期')  # 排除可能的异常记录
+                    df.iloc[:, 4].str.contains('煤', na=False, regex=True)  # 按实际关键词修改
+                    & ~df.iloc[:, 4].str.startswith('日期')  # 排除可能的异常记录
             )   
             df = df[mask]
             dfs.append(df)
