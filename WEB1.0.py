@@ -250,6 +250,9 @@ def main():
             # 直接使用原始数据，不进行聚合
             grouped = filtered.copy()
             grouped['date'] = grouped[date_col]
+             # 新增：传递格式化日期列
+            grouped['格式化日期'] = filtered['格式化日期'] 
+
     
             # 时间轴配置（根据实际日期范围动态调整）
             date_diff = (end_date - start_date).days
