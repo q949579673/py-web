@@ -205,7 +205,7 @@ def main():
                     grouped,
                     x=x_col,
                     y=comp,
-                    title=f"{comp}趋势",
+                    title=None,
                     markers=True,
                     height=300,
                     template="plotly_dark",  # 使用深色模板
@@ -216,16 +216,27 @@ def main():
                 grid_color = 'rgba(200, 200, 200, 0.2)'
 
                 fig.update_layout(
-                    margin=dict(l=20, r=20, t=40, b=60),
+                    margin=dict(l=20, r=20, t=80, b=60),
+                    title={
+                        'text': comp,  # 成分名称
+                        'y': 0.95,     # 纵向位置（0-1区间）
+                        'x': 0.5,      # 横向居中
+                        'xanchor': 'center',
+                        'yanchor': 'top',
+                        'font': {
+                            'size': 16,
+                            'color': 'white'  # 与主题一致
+                        }
+                    },
                     xaxis=dict(
                         title=None,
                         tickformat=tickformat,
                         dtick=dtick,
-                        tickangle=0 if selected_year == 'all' else 0,
                         showgrid=False,
                         color='white'
                     ),
                     yaxis=dict(
+                        title=None,
                         range=[grouped[comp].min() * 0.98, grouped[comp].max() * 1.02],
                         showgrid=True,
                         gridcolor=grid_color,
