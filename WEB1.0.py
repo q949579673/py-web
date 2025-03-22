@@ -8,7 +8,7 @@ def load_all_sheets_from_github():
     """从GitHub仓库读取Excel数据"""
     GITHUB_RAW_URL = "https://github.com/q949579673/py-web/raw/refs/heads/main/2022-2024%E5%B9%B4%E8%BF%9B%E5%8E%82%E7%82%BC%E7%84%A6%E7%85%A4%E8%B4%A8%E9%87%8F%E6%8C%87%E6%A0%87%E7%BB%9F%E8%AE%A1(2).xlsx"
     try:
-        xls = pd.ExcelFile(excel_path)
+        xls = pd.ExcelFile(GITHUB_RAW_URL, engine='openpyxl')
         sheet_names = xls.sheet_names
 
         dfs = []
@@ -21,6 +21,11 @@ def load_all_sheets_from_github():
             df = df[mask]
             dfs.append(df)
         return pd.concat(dfs, ignore_index=True)
+    
+    
+    except Exception as e:  # ✅ 添加异常处理
+        st.error(f"数据加载失败: {str(e)}")
+        return pd.DataFrame()  # 返回空DataFrame保持程序运行
 
 
 def main():
