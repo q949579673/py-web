@@ -354,10 +354,9 @@ def main():
                     marker=dict(color=line_color, size=8),
                     # 修改悬停模板为数值+日期双行显示
                     hovertemplate=(
-                        '<b>%{customdata[1]:.2f}</b>'  # 第一行加粗显示数值（保留两位小数）
-                        '<br>'  # 换行符
-                        '%{x|%Y-%m}'  # 第二行显示完整年月
-                        '<extra></extra>'  # 隐藏默认系列名称
+                        '<b>%{customdata[1]:.2f}</b>'  # 显示平均值
+                        '<br>%{customdata[0]}'          # 显示日期
+                        '<extra></extra>'
                     )
                 )
 
