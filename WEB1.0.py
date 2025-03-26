@@ -268,8 +268,17 @@ def main():
 
             with next(cols):
                 if use_custom_dates:  # 自定义日期模式使用原始数据点
+                    
+                    # 计算每个日期的平均值
+                    avg_values = filtered.groupby('原始日期')[comp].mean().reset_index()
+                    avg_values['平均值'] = avg_values[comp].round(2)
+                    avg_mapping = avg_values.set_index('原始日期')['平均值'].to_dict()
+                    
+                    # 将平均值映射到原始数据
+                    filtered['当日平均值'] = filtered['原始日期'].map(avg_mapping)
+                    
                     fig = px.scatter(  # 改用散点图显示每个数据点
-                        grouped,
+                        filtered,
                         x=x_col,
                         y=comp,
                         title=None,
@@ -345,7 +354,7 @@ def main():
                     marker=dict(color=line_color, size=8),
                     # 修改悬停模板为数值+日期双行显示
                     hovertemplate=(
-                        '<b>%{y:.2f}</b>'  # 第一行加粗显示数值（保留两位小数）
+                        '<b>%{customdata[1]:.2f}</b>'  # 第一行加粗显示数值（保留两位小数）
                         '<br>'  # 换行符
                         '%{x|%Y-%m}'  # 第二行显示完整年月
                         '<extra></extra>'  # 隐藏默认系列名称
