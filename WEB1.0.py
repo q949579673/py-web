@@ -280,7 +280,7 @@ def main():
                      # 将平均值映射到原始数据
                     filtered['当日平均值'] = filtered['原始日期'].map(avg_mapping)   
                     fig = px.scatter(  # 改用散点图显示每个数据点
-                        filtered,
+                        plot_data,
                         x='原始日期',
                         y=comp,
                         title=None,
