@@ -6,7 +6,7 @@ from itertools import chain
 
 def load_all_sheets_from_github():
     """从GitHub仓库读取Excel数据"""
-    GITHUB_RAW_URL = "https://github.com/q949579673/py-web/raw/refs/heads/main/2022-2024%E5%B9%B4%E8%BF%9B%E5%8E%82%E7%82%BC%E7%84%A6%E7%85%A4%E8%B4%A8%E9%87%8F%E6%8C%87%E6%A0%87%E7%BB%9F%E8%AE%A1(2).xlsx"
+    GITHUB_RAW_URL = "https://github.com/q949579673/py-web/raw/refs/heads/main/%E8%BF%9B%E5%8E%82%E7%82%BC%E7%84%A6%E7%85%A4%E8%B4%A8%E9%87%8F%E6%8C%87%E6%A0%87%E7%BB%9F%E8%AE%A1%E5%BA%93.xlsx"
     try:
         xls = pd.ExcelFile(GITHUB_RAW_URL, engine='openpyxl')
         sheet_names = xls.sheet_names
