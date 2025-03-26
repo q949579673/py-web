@@ -176,7 +176,7 @@ def main():
         default_end = max_date
         default_start = max_date - pd.DateOffset(days=6)
         # 日期选择器（仅在勾选时显示）
-        if use_custom_dates:
+        
             selected_dates = st.sidebar.date_input(
                 "选择查询日期范围",
                 value=(default_start, default_end),
@@ -202,6 +202,11 @@ def main():
                 ]
             # 添加日期格式化列
             filtered['格式化日期'] = filtered['原始日期'].dt.strftime('%Y-%m-%d')
+             # 添加平均值映射
+            avg_values = filtered.groupby('原始日期')[comp].mean().reset_index()
+            avg_mapping = avg_values.set_index('原始日期')[comp].to_dict()
+            filtered['当日平均值'] = filtered['原始日期'].map(avg_mapping)
+            
         else:
             # 使用C列月份过滤
             if selected_year != 'all':
@@ -279,7 +284,7 @@ def main():
                     
                     fig = px.scatter(  # 改用散点图显示每个数据点
                         filtered,
-                        x=x_col,
+                        x='原始日期',
                         y=comp,
                         title=None,
                         height=300,
@@ -288,14 +293,15 @@ def main():
                         color_discrete_sequence=['#00ff9d'],
                         hover_data={
                             '格式化日期': True,  # 显示格式化日期
-                            comp: ':.2f'  # 保留两位小数
+                            '当日平均值': ':.2f',
+                            comp: False  # 保留两位小数
                         }
                     )
                     # 优化时间轴显示
                     fig.update_layout(
                         xaxis=dict(
                             tickformat="%m/%d",  # 显示月/日格式
-                            tickvals=grouped['date'],  # 显示所有日期刻度
+                            tickvals=grouped['原始日期'],  # 显示所有日期刻度
                             tickangle=45 if len(grouped) > 10 else 0  # 数据点多时倾斜显示
                         )
                     )
