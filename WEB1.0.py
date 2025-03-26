@@ -272,16 +272,13 @@ def main():
                 break
 
             with next(cols):
-                if use_custom_dates:  # 自定义日期模式使用原始数据点
-                    
+                if use_custom_dates:  # 自定义日期模式使用原始数据点   
                     # 计算每个日期的平均值
                     avg_values = filtered.groupby('原始日期')[comp].mean().reset_index()
                     avg_values['平均值'] = avg_values[comp].round(2)
-                    avg_mapping = avg_values.set_index('原始日期')['平均值'].to_dict()
-                    
-                    # 将平均值映射到原始数据
-                    filtered['当日平均值'] = filtered['原始日期'].map(avg_mapping)
-                    
+                    avg_mapping = avg_values.set_index('原始日期')['平均值'].to_dict()          
+                     # 将平均值映射到原始数据
+                    filtered['当日平均值'] = filtered['原始日期'].map(avg_mapping)   
                     fig = px.scatter(  # 改用散点图显示每个数据点
                         filtered,
                         x='原始日期',
