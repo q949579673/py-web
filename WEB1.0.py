@@ -176,7 +176,7 @@ def main():
         default_end = max_date
         default_start = max_date - pd.DateOffset(days=6)
         # 日期选择器（仅在勾选时显示）
-        
+        if use_custom_dates:
             selected_dates = st.sidebar.date_input(
                 "选择查询日期范围",
                 value=(default_start, default_end),
