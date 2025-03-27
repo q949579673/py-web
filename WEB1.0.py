@@ -202,11 +202,6 @@ def main():
                 ]
             # 添加日期格式化列
             filtered['格式化日期'] = filtered['原始日期'].dt.strftime('%Y-%m-%d')
-             # 添加平均值映射
-            avg_values = filtered.groupby('原始日期')[comp].mean().reset_index()
-            avg_mapping = avg_values.set_index('原始日期')[comp].to_dict()
-            filtered['当日平均值'] = filtered['原始日期'].map(avg_mapping)
-            
         else:
             # 使用C列月份过滤
             if selected_year != 'all':
@@ -272,16 +267,10 @@ def main():
                 break
 
             with next(cols):
-                if use_custom_dates:  # 自定义日期模式使用原始数据点   
-                    # 计算每个日期的平均值
-                    avg_values = filtered.groupby('原始日期')[comp].mean().reset_index()
-                    avg_values['平均值'] = avg_values[comp].round(2)
-                    avg_mapping = avg_values.set_index('原始日期')['平均值'].to_dict()          
-                     # 将平均值映射到原始数据
-                    filtered['当日平均值'] = filtered['原始日期'].map(avg_mapping)   
+                if use_custom_dates:  # 自定义日期模式使用原始数据点
                     fig = px.scatter(  # 改用散点图显示每个数据点
-                        plot_data,
-                        x='原始日期',
+                        grouped,
+                        x=x_col,
                         y=comp,
                         title=None,
                         height=300,
@@ -290,15 +279,14 @@ def main():
                         color_discrete_sequence=['#00ff9d'],
                         hover_data={
                             '格式化日期': True,  # 显示格式化日期
-                            '当日平均值': ':.2f',
-                            comp: False  # 保留两位小数
+                            comp: ':.2f'  # 保留两位小数
                         }
                     )
                     # 优化时间轴显示
                     fig.update_layout(
                         xaxis=dict(
                             tickformat="%m/%d",  # 显示月/日格式
-                            tickvals=grouped['原始日期'],  # 显示所有日期刻度
+                            tickvals=grouped['date'],  # 显示所有日期刻度
                             tickangle=45 if len(grouped) > 10 else 0  # 数据点多时倾斜显示
                         )
                     )
@@ -357,9 +345,10 @@ def main():
                     marker=dict(color=line_color, size=8),
                     # 修改悬停模板为数值+日期双行显示
                     hovertemplate=(
-                        '<b>%{customdata[1]:.2f}</b>'  # 显示平均值
-                        '<br>%{customdata[0]}'          # 显示日期
-                        '<extra></extra>'
+                        '<b>%{y:.2f}</b>'  # 第一行加粗显示数值（保留两位小数）
+                        '<br>'  # 换行符
+                        '%{x|%Y-%m}'  # 第二行显示完整年月
+                        '<extra></extra>'  # 隐藏默认系列名称
                     )
                 )
 
